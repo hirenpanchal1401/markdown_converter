@@ -1,0 +1,16 @@
+{
+  "apps": [
+    {
+      "name": "markdownConvertor",
+      "script": "server.js",
+      "instances": "1",
+      "exec_mode": "fork",
+      "listen_timeout": 60000,
+      "restart_delay": 5000,
+      "wait_ready": true,
+      "output": "/dev/null",
+      "error": "/dev/null",
+      "node_args": "--max-old-space-size=6144"
+    }
+  ]
+}

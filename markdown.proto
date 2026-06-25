@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package markdown;
+
+service MarkdownService {
+  rpc ToHtml (MarkdownRequest) returns (MarkdownResponse);
+  rpc ToText (MarkdownRequest) returns (MarkdownResponse);
+}
+
+message MarkdownRequest {
+  string markdown = 1;
+}
+
+message MarkdownResponse {
+  string output = 1;
+}
