@@ -82,10 +82,16 @@ export const remarkNormalize = (options = {}) => {
    * Handle code blocks
    */
   function normalizeCode(tree) {
-    visit(tree, "code", (node, index, parent) => {
-      const parsed = unified().use(remarkParse).parse(node.value);
+    if (code === "keep") return;
 
-      // Inject parsed children into AST
+    visit(tree, "code", (node, index, parent) => {
+      if (code === "remove") {
+        parent.children.splice(index, 1);
+        return;
+      }
+
+      // 'unwrap': treat the code block's contents as markdown source
+      const parsed = unified().use(remarkParse).parse(node.value);
       parent.children.splice(index, 1, ...parsed.children);
     });
   }
@@ -122,6 +128,28 @@ export const normalizeMarkdownInput = (md) => {
 
   output = output.replace(/\r\n/g, "\n");
   output = fixPunctuationSpacing(output);
+
+  return output;
+};
+
+export const normalizeHTMLOutput = (html) => {
+  if (!html) return "";
+
+  let output = html;
+
+  // Remove empty paragraph tags inserted inside inline wrappers.
+  output = output.replace(
+    /<(em|strong|span|b|i|u)[^>]*>\s*(<p[^>]*>\s*<\/p>)+/gi,
+    "<$1>"
+  );
+  output = output.replace(
+    /(<p[^>]*>\s*<\/p>)+\s*<\/(em|strong|span|b|i|u)>/gi,
+    "</$2>"
+  );
+  output = output.replace(/<(em|strong|span|b|i|u)[^>]*>\s*<\/\1>/gi, "");
+
+  // Remove \n and \r characters from the output
+  output = output.replace(/[\n\r]/g, "");
 
   return output;
 };

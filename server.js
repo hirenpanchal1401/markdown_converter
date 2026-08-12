@@ -19,7 +19,7 @@ import { defaultSchema } from "hast-util-sanitize";
 
 import strip from "strip-markdown";
 import remarkStringify from "remark-stringify";
-import { remarkNormalize, normalizeMarkdownInput } from "./remarkNormalize.js";
+import { remarkNormalize, normalizeMarkdownInput, normalizeHTMLOutput } from "./remarkNormalize.js";
 
 /**
  * Proto load
@@ -33,6 +33,7 @@ const markdownPackage = grpcObj.markdown;
  */
 const customSchema = {
   ...defaultSchema,
+  tagNames: [...defaultSchema.tagNames, "mark"],
   attributes: {
     ...defaultSchema.attributes,
     code: [...(defaultSchema.attributes.code || []), "className"],
@@ -46,7 +47,7 @@ const customSchema = {
 const htmlProcessor = unified()
   .use(remarkParse)
   .use(remarkNormalize, {
-    code: "unwrap",
+    code: "keep",
     enableMark: true,
   })
   .use(remarkGfm)
@@ -72,7 +73,7 @@ async function toHtml(call, callback) {
     const markdown = normalizeMarkdownInput(call.request.markdown || "");
     const file = await htmlProcessor.process(markdown);
 
-    callback(null, { output: String(file) });
+    callback(null, { output: normalizeHTMLOutput(file.toString()) });
   } catch (err) {
     callback(err);
   }
@@ -83,7 +84,7 @@ async function toText(call, callback) {
     const markdown = call.request.markdown || "";
     const file = await textProcessor.process(markdown);
 
-    callback(null, { output: String(file) });
+    callback(null, { output: file.toString() });
   } catch (err) {
     callback(err);
   }
