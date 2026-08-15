@@ -134,19 +134,18 @@ export const normalizeMarkdownInput = (md) => {
 
 export const normalizeHTMLOutput = (html) => {
   if (!html) return "";
-
   let output = html;
 
   // Remove empty paragraph tags inserted inside inline wrappers.
   output = output.replace(
-    /<(em|strong|span|b|i|u)[^>]*>\s*(<p[^>]*>\s*<\/p>)+/gi,
-    "<$1>"
+    /<(em|strong|span|b|i|u)\b([^>]*)>\s*(<p[^>]*>\s*<\/p>)+/gi,
+    "<$1$2>"
   );
   output = output.replace(
     /(<p[^>]*>\s*<\/p>)+\s*<\/(em|strong|span|b|i|u)>/gi,
     "</$2>"
   );
-  output = output.replace(/<(em|strong|span|b|i|u)[^>]*>\s*<\/\1>/gi, "");
+  output = output.replace(/<(em|strong|span|b|i|u)\b([^>]*)>\s*<\/\1>/gi, "");
 
   // Remove \n and \r characters from the output
   output = output.replace(/[\n\r]/g, "");
