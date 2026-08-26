@@ -33,7 +33,7 @@ const markdownPackage = grpcObj.markdown;
  */
 const customSchema = {
   ...defaultSchema,
-  tagNames: [...defaultSchema.tagNames, "mark"],
+  tagNames: [...defaultSchema.tagNames, "mark", "u"],
   attributes: {
     ...defaultSchema.attributes,
     code: [...(defaultSchema.attributes.code || []), "className"],
